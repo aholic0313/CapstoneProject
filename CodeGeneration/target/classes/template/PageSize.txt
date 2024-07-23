@@ -1,0 +1,12 @@
+public enum PageSize {
+    SIZE20(20),SIZE15(15),SIZE30(30),SIZE40(40),SIZE50(50);
+
+    Integer size;
+
+    PageSize(int size) {
+        this.size = size;
+    }
+    public Integer getSize(){
+        return size;
+    }
+}
