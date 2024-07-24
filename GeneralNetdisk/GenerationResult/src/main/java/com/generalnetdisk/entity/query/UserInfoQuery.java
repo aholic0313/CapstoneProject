@@ -4,7 +4,7 @@ import java.util.Date;
 /**
  * @Description: 用户信息
  *
- * @Date: 2024/07/22
+ * @Date: 2024/07/24
  */
 public class UserInfoQuery extends BaseQueryParam {
 	/* 用户ID查询对象 */

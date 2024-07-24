@@ -8,6 +8,8 @@ import com.generalnetdisk.entity.dto.CreateImageCode;
 import com.generalnetdisk.entity.po.UserInfo;
 import com.generalnetdisk.entity.query.UserInfoQuery;
 import com.generalnetdisk.entity.vo.ResponseVO;
+import com.generalnetdisk.exception.BusinessException;
+import com.generalnetdisk.service.EmailCodeService;
 import com.generalnetdisk.service.UserInfoService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +29,9 @@ public class AccountController extends BaseController {
     @Resource
     private UserInfoService userInfoService;
 
+    @Resource
+    private EmailCodeService emailCodeService;
+
     @RequestMapping("/checkCode")
     public void checkCode(HttpServletResponse response, HttpSession session, Integer type) throws
             IOException {
@@ -42,5 +47,18 @@ public class AccountController extends BaseController {
             session.setAttribute(Constants.CHECK_CODE_KEY_EMAIL, code);
         }
         vCode.write(response.getOutputStream());
+    }
+
+    @RequestMapping("/sendEmailCode")
+    public ResponseVO sendEmailCode(HttpSession session, String email, String checkCode, Integer type) {
+        try {
+            if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY_EMAIL))) {
+                throw new BusinessException("验证码不匹配");
+            }
+            emailCodeService.sendEmailCode(email, type);
+            return getSuccessResponseVO(null);
+        } finally {
+            session.removeAttribute(Constants.CHECK_CODE_KEY_EMAIL);
+        }
     }
 }

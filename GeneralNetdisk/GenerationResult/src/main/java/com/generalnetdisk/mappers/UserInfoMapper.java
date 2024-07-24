@@ -5,7 +5,7 @@ import org.apache.ibatis.annotations.Param;
 /**
  * @Description: 用户信息
  *
- * @Date: 2024/07/22
+ * @Date: 2024/07/24
  */
 public interface UserInfoMapper<T, P> extends BaseMapper {
 	/* 根据UserId查询 */

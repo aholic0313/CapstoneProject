@@ -1,6 +1,5 @@
 package com.generalnetdisk.utils;
 
-
 public class StringUtils {
     public static String UpperCaseFirstLetter(String s) {
         if (org.apache.commons.lang3.StringUtils.isEmpty(s)) {

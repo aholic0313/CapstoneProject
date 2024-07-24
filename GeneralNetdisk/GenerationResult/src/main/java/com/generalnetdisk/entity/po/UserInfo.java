@@ -10,7 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 /**
  * @Description: 用户信息
  *
- * @Date: 2024/07/22
+ * @Date: 2024/07/24
  */
 public class UserInfo implements Serializable {
 	/* 用户ID */
