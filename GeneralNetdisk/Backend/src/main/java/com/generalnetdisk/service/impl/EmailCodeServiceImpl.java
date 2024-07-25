@@ -3,7 +3,10 @@ package com.generalnetdisk.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import com.generalnetdisk.component.RedisComponent;
+import com.generalnetdisk.entity.config.AppConfig;
 import com.generalnetdisk.entity.constants.Constants;
+import com.generalnetdisk.entity.dto.SysSettingsDto;
 import com.generalnetdisk.entity.po.EmailCode;
 import com.generalnetdisk.entity.po.UserInfo;
 import com.generalnetdisk.entity.query.EmailCodeQuery;
@@ -17,10 +20,15 @@ import com.generalnetdisk.enums.PageSize;
 import com.generalnetdisk.mappers.EmailCodeMapper;
 import com.generalnetdisk.service.UserInfoService;
 import com.generalnetdisk.utils.StringTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.mail.internet.MimeMessage;
 
 /**
  * @Description: 邮箱验证码业务接口
@@ -29,11 +37,22 @@ import javax.annotation.Resource;
 @Service("emailCodeService")
 public class EmailCodeServiceImpl implements EmailCodeService {
 
+    private static final Logger logger = LoggerFactory.getLogger(EmailCodeServiceImpl.class);
+
     @Resource
     private EmailCodeMapper<EmailCode, EmailCodeQuery> emailCodeMapper;
 
     @Resource
     private UserInfoMapper<UserInfo, UserInfoQuery> userInfoMapper;
+
+    @Resource
+    private JavaMailSender mailSender;
+
+    @Resource
+    private AppConfig appConfig;
+
+    @Resource
+    private RedisComponent redisComponent;
 
     /* 根据条件查询列表 */
     @Override
@@ -114,8 +133,8 @@ public class EmailCodeServiceImpl implements EmailCodeService {
 
         String code = StringTools.getRandomNumber(Constants.LENGTH_5);
 
-        //TODO 发送验证码
-
+        //发送验证码
+        sendmailCode(email, code);
         //将之前的验证码 置为无效
         emailCodeMapper.disableEmailCode(email);
 
@@ -125,5 +144,22 @@ public class EmailCodeServiceImpl implements EmailCodeService {
         emailCode.setStatus(Constants.ZERO);
         emailCode.setCreateTime(new Date());
         emailCodeMapper.insert(emailCode);
+    }
+
+    private void sendmailCode(String toEmail, String code) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(appConfig.getSendUserName());
+            helper.setTo(toEmail);
+            SysSettingsDto sysSettingsDto = redisComponent.getSysSettingDto();
+            helper.setSubject(sysSettingsDto.getRegisterMailTitle());
+            helper.setText(String.format(sysSettingsDto.getRegisterMailContent(), code));
+            helper.setSentDate(new Date());
+            mailSender.send(message);
+        } catch (Exception e) {
+            logger.error("邮件发送失败", e);
+            throw new BusinessException("邮件发送失败");
+        }
     }
 }

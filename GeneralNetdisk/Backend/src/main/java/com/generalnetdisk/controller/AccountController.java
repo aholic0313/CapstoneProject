@@ -1,19 +1,17 @@
 package com.generalnetdisk.controller;
 
 import java.io.IOException;
-import java.util.List;
 
+import com.generalnetdisk.annotation.GlobalInterceptor;
+import com.generalnetdisk.annotation.VerifyParam;
 import com.generalnetdisk.entity.constants.Constants;
 import com.generalnetdisk.entity.dto.CreateImageCode;
-import com.generalnetdisk.entity.po.UserInfo;
-import com.generalnetdisk.entity.query.UserInfoQuery;
 import com.generalnetdisk.entity.vo.ResponseVO;
 import com.generalnetdisk.exception.BusinessException;
 import com.generalnetdisk.service.EmailCodeService;
 import com.generalnetdisk.service.UserInfoService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -50,7 +48,10 @@ public class AccountController extends BaseController {
     }
 
     @RequestMapping("/sendEmailCode")
-    public ResponseVO sendEmailCode(HttpSession session, String email, String checkCode, Integer type) {
+    @GlobalInterceptor(checkParams = true)
+    public ResponseVO sendEmailCode(HttpSession session, @VerifyParam(required = true) String email,
+                                    @VerifyParam(required = true) String checkCode,
+                                    @VerifyParam(required = true) Integer type) {
         try {
             if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY_EMAIL))) {
                 throw new BusinessException("验证码不匹配");
