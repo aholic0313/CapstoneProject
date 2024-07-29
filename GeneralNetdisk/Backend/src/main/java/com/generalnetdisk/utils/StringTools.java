@@ -1,5 +1,6 @@
 package com.generalnetdisk.utils;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
 public class StringTools {
@@ -20,5 +21,19 @@ public class StringTools {
             return true;
         }
         return false;
+    }
+
+    public static String encodeByMd5(String orignString) {
+        return isEmpty(orignString) ? null : DigestUtils.md5Hex(orignString);
+    }
+
+    public static boolean pathIsOk(String path) {
+        if (StringTools.isEmpty(path)) {
+            return true;
+        }
+        if (path.contains("../") || path.contains("..\\")) {
+            return false;
+        }
+        return true;
     }
 }

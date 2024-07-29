@@ -2,6 +2,7 @@ package com.generalnetdisk.component;
 
 import com.generalnetdisk.entity.constants.Constants;
 import com.generalnetdisk.entity.dto.SysSettingsDto;
+import com.generalnetdisk.entity.dto.UserSpaceDto;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -18,5 +19,21 @@ public class RedisComponent {
             redisUtils.set(Constants.REDIS_KEY_SYS_SETTING, sysSettingsDto);
         }
         return sysSettingsDto;
+    }
+
+    public void saveUserSpaceUse(String userId, UserSpaceDto userSpaceDto) {
+        redisUtils.setex(Constants.REDIS_KEY_USER_SPACE_USE + userId, userSpaceDto, Constants.REDIS_KEY_EXPIRES_DAY);
+    }
+
+    public UserSpaceDto getUserSpaceUse(String userId) {
+        UserSpaceDto spaceDto = (UserSpaceDto) redisUtils.get(Constants.REDIS_KEY_USER_SPACE_USE + userId);
+        if (spaceDto == null) {
+            spaceDto = new UserSpaceDto();
+            // TODO 查询当前用户已经上传文件总大小
+            spaceDto.setUseSpace(0L);
+            spaceDto.setTotalSpace(getSysSettingDto().getUserInitUseSpace() * Constants.MB);
+            saveUserSpaceUse(userId, spaceDto);
+        }
+        return spaceDto;
     }
 }
