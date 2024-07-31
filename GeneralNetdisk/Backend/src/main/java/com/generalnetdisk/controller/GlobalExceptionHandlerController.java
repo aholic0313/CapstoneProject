@@ -34,8 +34,8 @@ public class GlobalExceptionHandlerController extends BaseController {
             ajaxResponse.setStatus(STATUS_ERROR);
         } else if (e instanceof BindException) {
             // 参数类型错误
-            ajaxResponse.setCode(ResponseCodeEnum.CODE_400.getCode());
-            ajaxResponse.setInfo(ResponseCodeEnum.CODE_400.getMessage());
+            ajaxResponse.setCode(ResponseCodeEnum.CODE_600.getCode());
+            ajaxResponse.setInfo(ResponseCodeEnum.CODE_600.getMessage());
             ajaxResponse.setStatus(STATUS_ERROR);
         } else if (e instanceof DuplicateKeyException) {
             // 主键冲突

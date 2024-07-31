@@ -2,6 +2,8 @@ package com.generalnetdisk.aspect;
 
 import com.generalnetdisk.annotation.GlobalInterceptor;
 import com.generalnetdisk.annotation.VerifyParam;
+import com.generalnetdisk.entity.constants.Constants;
+import com.generalnetdisk.entity.dto.SessionWebUserDto;
 import com.generalnetdisk.enums.ResponseCodeEnum;
 import com.generalnetdisk.exception.BusinessException;
 import com.generalnetdisk.utils.StringTools;
@@ -14,7 +16,11 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -46,6 +52,14 @@ public class GlobalOperatcionAspect {
             if (null == interceptor) {
                 return;
             }
+
+            /**
+             * 校验登录
+             */
+            if (interceptor.checkLogin() || interceptor.checkAdmin()) {
+                checkLogin(interceptor.checkAdmin());
+            }
+
             /**
              * 校验参数
              */
@@ -61,6 +75,20 @@ public class GlobalOperatcionAspect {
         } catch (Throwable e) {
             logger.error("全局拦截器异常", e);
             throw new BusinessException(ResponseCodeEnum.CODE_500);
+        }
+    }
+
+    private void checkLogin(Boolean checkAdmin) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpSession session = request.getSession();
+        SessionWebUserDto webUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
+
+        if (null == webUserDto) {
+            throw new BusinessException(ResponseCodeEnum.CODE_901);
+        }
+
+        if (checkAdmin && !webUserDto.getAdmin()) {
+            throw new BusinessException(ResponseCodeEnum.CODE_404);
         }
     }
 
@@ -102,7 +130,7 @@ public class GlobalOperatcionAspect {
             throw e;
         } catch (Exception e) {
             logger.error("校验参数失败", e);
-            throw new BusinessException(ResponseCodeEnum.CODE_400);
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
     }
 
@@ -114,21 +142,21 @@ public class GlobalOperatcionAspect {
          * 校验空
          */
         if (isEmpty && verifyParam.required()) {
-            throw new BusinessException(ResponseCodeEnum.CODE_400);
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
 
         /**
          * 校验长度
          */
         if (!isEmpty && (verifyParam.max() != -1 && verifyParam.max() < length || verifyParam.min() != -1 && verifyParam.min() > length)) {
-            throw new BusinessException(ResponseCodeEnum.CODE_400);
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
 
         /**
          * 校验正则
          */
         if (!isEmpty && !StringTools.isEmpty(verifyParam.regex().getRegex()) && !VerifyUtils.verify(verifyParam.regex(), String.valueOf(value))) {
-            throw new BusinessException(ResponseCodeEnum.CODE_400);
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
     }
 }

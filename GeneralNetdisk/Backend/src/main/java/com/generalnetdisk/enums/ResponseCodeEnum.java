@@ -2,15 +2,12 @@ package com.generalnetdisk.enums;
 
 
 public enum ResponseCodeEnum {
-    CODE_200(200, "操作成功"),
-    CODE_500(500, "服务器内部错误"),
-    CODE_400(400, "请求参数错误"),
-    CODE_401(401, "用户未认证"),
-    CODE_403(403, "用户无权限访问"),
-    CODE_404(404, "资源不存在"),
-    CODE_405(405, "方法不被允许"),
+    CODE_200(200, "请求成功"),
+    CODE_404(404, "请求地址不存在"),
+    CODE_500(500, "服务器返回错误"),
+    CODE_600(600, "请求参数错误"),
     CODE_601(601, "信息已存在"),
-    CODE_503(503, "服务不可用");
+    CODE_901(901, "登录超时，请重新登录");
 
     private int code;
     private String message;

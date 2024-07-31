@@ -73,7 +73,7 @@ public class AccountController extends BaseController {
     }
 
     @RequestMapping("/sendEmailCode")
-    @GlobalInterceptor(checkParams = true)
+    @GlobalInterceptor(checkParams = true, checkLogin = false)
     public ResponseVO sendEmailCode(HttpSession session,
                                     @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL, max = 150) String email,
                                     @VerifyParam(required = true) String checkCode,
@@ -90,7 +90,7 @@ public class AccountController extends BaseController {
     }
 
     @RequestMapping("/register")
-    @GlobalInterceptor(checkParams = true)
+    @GlobalInterceptor(checkParams = true, checkLogin = false)
     public ResponseVO register(HttpSession session,
                                @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL, max = 150) String email,
                                @VerifyParam(required = true) String nickName,
@@ -109,7 +109,7 @@ public class AccountController extends BaseController {
     }
 
     @RequestMapping("/login")
-    @GlobalInterceptor(checkParams = true)
+    @GlobalInterceptor(checkParams = true, checkLogin = false)
     public ResponseVO login(HttpSession session,
                             @VerifyParam(required = true) String email,
                             @VerifyParam(required = true) String password,
@@ -127,7 +127,7 @@ public class AccountController extends BaseController {
     }
 
     @RequestMapping("/resetPwd")
-    @GlobalInterceptor(checkParams = true)
+    @GlobalInterceptor(checkParams = true, checkLogin = false)
     public ResponseVO resetPwd(HttpSession session,
                                @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL, max = 150) String email,
                                @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD, min = 8, max = 18) String password,
@@ -145,7 +145,7 @@ public class AccountController extends BaseController {
     }
 
     @RequestMapping("/getAvatar/{userId}")
-    @GlobalInterceptor(checkParams = true)
+    @GlobalInterceptor(checkParams = true, checkLogin = false)
     public void getAvatar(HttpServletResponse response,
                           @VerifyParam(required = true) @PathVariable("userId") String userId) {
         String avatarFolderName = Constants.FILE_FOLDER_FILE + Constants.FILE_FOLDER_AVATAR_NAME;
@@ -187,16 +187,15 @@ public class AccountController extends BaseController {
         return getSuccessResponseVO(sessionWebUserDto);
     }
 
-    @RequestMapping("/getUserSpace")
-    @GlobalInterceptor(checkParams = true)
-    public ResponseVO getUserSpace(HttpSession session) {
+    @RequestMapping("/getUseSpace")
+    @GlobalInterceptor
+    public ResponseVO getUseSpace(HttpSession session) {
         SessionWebUserDto sessionWebUserDto = getUserInfoFromSession(session);
         UserSpaceDto spaceDto = redisComponent.getUserSpaceUse(sessionWebUserDto.getUserId());
         return getSuccessResponseVO(spaceDto);
     }
 
     @RequestMapping("/logout")
-    @GlobalInterceptor(checkParams = true)
     public ResponseVO logout(HttpSession session) {
         session.invalidate();
         return getSuccessResponseVO(null);

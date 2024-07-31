@@ -36,7 +36,7 @@ public class BaseController {
         ResponseVO<T> responseVO = new ResponseVO();
         responseVO.setStatus(STATUS_ERROR);
         if (e.getCode() == null) {
-            responseVO.setCode(ResponseCodeEnum.CODE_400.getCode());
+            responseVO.setCode(ResponseCodeEnum.CODE_600.getCode());
         } else {
             responseVO.setCode(e.getCode());
         }
